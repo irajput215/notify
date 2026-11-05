@@ -27,13 +27,19 @@ export interface Seed {
   confirmationHistory: DailyPoint[];
 }
 
+/** Contacts with scripted stories never get random appointments that could contradict them. */
+const FEATURED = new Set([
+  "ct_olivia", "ct_liam", "ct_grace", "ct_tom", "ct_aisha", "ct_michael", "ct_daniel", "ct_chloe",
+  "ct_ethan", "ct_zoe", "ct_noah", "ct_isla", "ct_ruby", "ct_lucas", "ct_sophie",
+]);
+
 /** Builds a fresh copy of the whole demo workspace relative to `now`. */
 export function createSeed(now = new Date()): Seed {
   const contacts = buildContacts(now);
   const byId = Object.fromEntries(contacts.map((c) => [c.id, c]));
   const appointments = buildAppointments(
     now,
-    contacts.filter((c) => c.isPatient).map((c) => c.id),
+    contacts.filter((c) => c.isPatient && !FEATURED.has(c.id)).map((c) => c.id),
   ).map((a) => (a.contactId && !a.patientName ? { ...a, patientName: byId[a.contactId].name } : a));
   const apptMap = Object.fromEntries(appointments.map((a) => [a.id, a]));
   const threads = [...buildScriptedThreads(now, apptMap), ...buildExtraThreads(now, apptMap)];
