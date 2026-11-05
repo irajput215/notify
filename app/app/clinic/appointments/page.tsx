@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { PageContainer, PageHeader } from "@/components/shared/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
+import { AppointmentsView } from "@/components/appointments/appointments-view";
 
 export const metadata: Metadata = { title: "Appointments" };
 
-export default function Page() {
+export default function AppointmentsPage() {
   return (
-    <PageContainer>
-      <PageHeader title="Appointments" />
-      <Skeleton className="h-64 w-full rounded-xl" />
-    </PageContainer>
+    <Suspense>
+      <AppointmentsView />
+    </Suspense>
   );
 }

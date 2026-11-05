@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useDemoStore } from "@/lib/store/demo-store";
 import { Logo } from "@/components/brand/logo";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarNav } from "./sidebar-nav";
 import { Topbar } from "./topbar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const boot = useDemoStore((s) => s.boot);
+  // Pages depend on the viewer's clock, so render them only on the client.
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   useEffect(() => {
     void boot();
   }, [boot]);
@@ -29,7 +32,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
         <main id="main" className="min-h-0 flex-1 overflow-y-auto">
-          {children}
+          {mounted ? children : (
+            <div className="space-y-6 p-4 md:p-8">
+              <Skeleton className="h-8 w-56" />
+              <Skeleton className="h-64 w-full rounded-xl" />
+            </div>
+          )}
         </main>
       </div>
     </div>
