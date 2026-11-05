@@ -13,5 +13,5 @@ export const saveAiSettings = (settings: AiSettings) =>
     return db().ai;
   }, 400);
 
-/** POST /ai/test — dry run against the current settings, no messages sent. */
-export const testAi = (question: string) => request(() => previewReply(question, db().ai), 700);
+/** POST /ai/test — dry run, no messages sent. Pass unsaved settings to test a draft. */
+export const testAi = (question: string, draft?: AiSettings) => request(() => previewReply(question, draft ?? db().ai), 700);

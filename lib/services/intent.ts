@@ -40,8 +40,13 @@ const BUTTONS: Record<string, Intent> = {
   book: { kind: "book" },
 };
 
-const has = (text: string, words: string[]) =>
-  words.filter((w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i").test(text));
+/** Symptom, treatment and medication language that always goes to a person. */
+const CLINICAL_PATTERN =
+  /\b(swollen|swell\w*|hurts?|hurting|aches?|aching|sore|numb\w*|tingl\w*|dizz\w*|bleed\w*|bruis\w*|fever|medicat\w*|painkillers?|ibuprofen|injur\w*|should i (ice|heat|exercise|stretch|rest|take|keep))\b/;
+
+/** Keyword match. `prefix` lets "pain" also match "painful"; FAQs use whole words. */
+const has = (text: string, words: string[], prefix = true) =>
+  words.filter((w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}${prefix ? "" : "\\b"}`, "i").test(text));
 
 export function classify(input: CustomerInput, ai: AiSettings): Intent {
   if (input.buttonId) {
@@ -54,9 +59,11 @@ export function classify(input: CustomerInput, ai: AiSettings): Intent {
   if (/^(stop|unsubscribe|stop all)$/i.test(text)) return { kind: "opt_out" };
   if (/^(start|subscribe)$/i.test(text)) return { kind: "opt_in" };
 
-  // Safety first: anything that looks clinical goes to a person.
+  // Safety first: anything that looks clinical goes to a person. The built-in
+  // patterns back the locked "never give clinical advice" guardrail.
   const matched = has(lower, ai.escalationKeywords);
-  if (matched.length) return { kind: "escalate", matched };
+  const clinical = lower.match(CLINICAL_PATTERN)?.[0];
+  if (matched.length || clinical) return { kind: "escalate", matched: matched.length ? matched : [clinical ?? "clinical"] };
 
   const day = /\bfri(day)?\b/.test(lower) ? "friday" : /\btomorrow\b/.test(lower) ? "tomorrow" : undefined;
   if (/\bcancel/.test(lower)) return { kind: "cancel_request" };
@@ -66,7 +73,7 @@ export function classify(input: CustomerInput, ai: AiSettings): Intent {
   if (/\b(confirm|confirmed|see you then)\b/.test(lower)) return { kind: "confirm" };
   if (/\b(book|appointment|booking)\b/.test(lower)) return { kind: "book" };
 
-  const faq = ai.faqs.find((f) => has(lower, f.keywords).length > 0);
+  const faq = ai.faqs.find((f) => has(lower, f.keywords, false).length > 0);
   if (faq) return { kind: "faq", faq };
 
   if (/^(hi|hello|hey|g'?day|good (morning|afternoon))\b/.test(lower)) return { kind: "greeting" };

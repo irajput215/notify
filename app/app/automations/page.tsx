@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { PageContainer, PageHeader } from "@/components/shared/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
+import { AutomationsView } from "@/components/automations/automations-view";
 
 export const metadata: Metadata = { title: "Automations" };
 
-export default function Page() {
+export default function AutomationsPage() {
   return (
-    <PageContainer>
-      <PageHeader title="Automations" />
-      <Skeleton className="h-64 w-full rounded-xl" />
-    </PageContainer>
+    <Suspense>
+      <AutomationsView />
+    </Suspense>
   );
 }
