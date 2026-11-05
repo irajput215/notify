@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { PageContainer, PageHeader } from "@/components/shared/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
+import { SettingsView } from "@/components/settings/settings-view";
 
 export const metadata: Metadata = { title: "Settings" };
 
-export default function Page() {
+export default function SettingsPage() {
   return (
-    <PageContainer>
-      <PageHeader title="Settings" />
-      <Skeleton className="h-64 w-full rounded-xl" />
-    </PageContainer>
+    <Suspense>
+      <SettingsView />
+    </Suspense>
   );
 }
