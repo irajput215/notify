@@ -51,7 +51,7 @@ export function Composer({ conversation, contact, now }: { conversation: Convers
   }
 
   return (
-    <div className="shrink-0 border-t bg-card">
+    <div className="@container shrink-0 border-t bg-card">
       {!optedOut && (
         <div className={cn("flex flex-wrap items-center gap-3 px-4 py-2 text-xs", humanMode ? "bg-muted/60" : "bg-bubble-ai/60")}>
           <span className="flex flex-1 items-center gap-1.5 text-muted-foreground">
@@ -118,12 +118,12 @@ export function Composer({ conversation, contact, now }: { conversation: Convers
               <div className="flex items-center gap-1 px-2 pb-2">
                 <QuickReplies disabled={mode === "note"} onPick={(b) => setText((t) => (t ? `${t} ${b}` : b))} />
                 <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setTemplatesOpen(true)} disabled={optedOut}>
-                  <FileText /> Templates
+                  <FileText /> <span className="hidden @md:inline">Templates</span>
                 </Button>
-                <span className="ml-auto hidden text-[11px] text-muted-foreground lg:inline">
+                <span className="ml-auto hidden text-[11px] text-muted-foreground @2xl:inline">
                   {mode === "reply" && !humanMode ? "Sending takes over from the AI" : "Enter to send · Shift+Enter for new line"}
                 </span>
-                <Button size="sm" onClick={() => void submit()} disabled={!text.trim() || sending} className="ml-2">
+                <Button size="sm" onClick={() => void submit()} disabled={!text.trim() || sending} className="ml-auto @2xl:ml-2">
                   {sending ? <Loader2 className="animate-spin" /> : mode === "note" ? <StickyNote /> : <Send />}
                   {mode === "note" ? "Add note" : "Send"}
                 </Button>

@@ -27,9 +27,10 @@ export function MessageList({ conversationId }: { conversationId: string }) {
   const loadMessages = useDemoStore((s) => s.loadMessages);
   const endRef = useRef<HTMLDivElement>(null);
 
+  const loaded = Boolean(messages);
   useEffect(() => {
-    void loadMessages(conversationId);
-  }, [conversationId, loadMessages]);
+    if (!loaded) void loadMessages(conversationId);
+  }, [conversationId, loaded, loadMessages]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -65,8 +66,8 @@ export function MessageList({ conversationId }: { conversationId: string }) {
     <div className="flex flex-col gap-3 px-4 py-5 md:px-8" aria-live="polite">
       {items.map((it) =>
         it.type === "day" ? (
-          <div key={it.key} className="sticky top-2 z-10 flex justify-center">
-            <span className="rounded-full bg-card/90 px-3 py-1 text-[11px] font-medium text-muted-foreground shadow-xs backdrop-blur">{it.label}</span>
+          <div key={it.key} className="flex justify-center py-1">
+            <span className="rounded-full bg-card px-3 py-1 text-[11px] font-medium text-muted-foreground shadow-xs">{it.label}</span>
           </div>
         ) : (
           <MessageBubble key={it.m.id} message={it.m} author={team.find((t) => t.id === it.m.staffId)} />

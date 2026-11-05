@@ -42,6 +42,7 @@ interface DemoState {
 }
 
 let unsubscribe: (() => void) | null = null;
+const pending = new Set<string>();
 
 async function loadAll() {
   const [workspace, team, practitioners, currentUserId, contacts, conversations, appointments, dashboard] =
@@ -96,9 +97,14 @@ export const useDemoStore = create<DemoState>((set, get) => ({
   },
 
   loadMessages: async (conversationId) => {
-    if (get().messages[conversationId]) return;
-    const list = await conversationsApi.getMessages(conversationId);
-    set((s) => ({ messages: { ...s.messages, [conversationId]: list } }));
+    if (get().messages[conversationId] || pending.has(conversationId)) return;
+    pending.add(conversationId);
+    try {
+      const list = await conversationsApi.getMessages(conversationId);
+      set((s) => ({ messages: { ...s.messages, [conversationId]: list } }));
+    } finally {
+      pending.delete(conversationId);
+    }
   },
 
   apply: (event) => {

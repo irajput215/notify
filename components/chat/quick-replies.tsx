@@ -19,7 +19,7 @@ export function QuickReplies({ onPick, disabled }: { onPick: (body: string) => v
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="sm" disabled={disabled} className="text-muted-foreground">
-          <Zap /> Quick replies
+          <Zap /> <span className="hidden @md:inline">Quick replies</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-80 p-1">
